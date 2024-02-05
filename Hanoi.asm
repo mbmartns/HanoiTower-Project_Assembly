@@ -142,9 +142,17 @@ _atoi:
         push ebp                      ; empurra o registrador ebp na pilha (para ser a base)
         mov ebp, esp                  ; aponta o ponteiro do topo da pilha (esp) para a base
         
-        mov eax, [ebp + 8]            ; coloca no registrador ax o disco a ser movido
-        add al, 48                    ; conversao na tabela ASCII
-        mov [disco], al               ; coloca o valor no [disco] para o print
+
+        mov eax, [ebp + 8]         ; Coloca o número a ser convertido em eax
+        lea ebx, [num_buffer]      ; Endereço do buffer para armazenar a string convertida
+        call itoa                  ; Chama a função itoa para converter o número para string
+        lea edi, [disco ]      ; Endereço de destino (disco), pulando os dois espaços iniciais
+        mov esi, ebx               ; Endereço de origem (buffer)
+        
+        ; Copia a string convertida diretamente para disco, começando após os dois espaços
+        mov ecx, num_length        ; Tamanho da string convertida
+        rep movsb                  ; Copia a string de esi para edi
+
 
         mov eax, [ebp + 12]           ; coloca no registrador ax a torre de onde o disco saiu
         add al, 64                    ; conversao na tabela ASCII
@@ -194,10 +202,10 @@ section .data
     menu db 'DIGITE A QUANTIDADE DE DISCOS: ' ,0xa      ; mensagem do menu que aparecerá ao rodar a aplicação
     len equ $-menu                                      ; tamanho da mensagem do menu armazenado em na variável 'len'
 
-    ; FORMATAÃ‡ÃƒO DE SAÃ DA
+    ; formatação da mensagem
     msg:
                           db        "disc: "   
-        disco:            db        " "
+        disco:            db        "  "
                           db        "   "                      
         pino_destino:      db        " "  
                           db        " -> "     
