@@ -154,23 +154,26 @@ _atoi:
         rep movsb                  ; Copia a string de esi para edi
 
 
-        mov eax, [ebp + 12]           ; coloca no registrador ax a torre de onde o disco saiu
-        add al, 64                    ; conversao na tabela ASCII
-        mov [pino_destino], al         ; coloca o valor no [torre_saida] para o print
 
-        mov eax, [ebp + 16]           ; coloca no registrador ax a torre de onde o disco foi
-        add al, 64                    ; conversao na tabela ASCII
-        mov [pino_origem], al           ; coloca o valor no [torre_ida] para o print
-
-        mov edx, lenght               ; tamanho da mensagem
-        mov ecx, msg                  ; mensagem em si
-        mov ebx, 1                    ; dá permissão para a saida
-        mov eax, 4                    ; informa que será uma escrita
+    
+        mov eax, [ebp + 12]           ; Coloca no registrador eax a torre de onde o disco saiu
+        add al, 64                    ; Conversão para ASCII
+        mov [pino_destino], al         ; Coloca o valor em [pino_destino] para o print
+    
+        mov eax, [ebp + 16]           ; Coloca no registrador eax a torre de onde o disco foi
+        add al, 64                    ; Conversão para ASCII
+        mov [pino_origem], al          ; Coloca o valor em [pino_origem] para o print
+    
+        mov edx, lenght               ; Tamanho da mensagem
+        mov ecx, msg                  ; Mensagem em si
+        mov ebx, 1                    ; Dá permissão para a saída
+        mov eax, 4                    ; Informa que será uma escrita
         int 128                       ; Interrupção para kernel
+    
+        mov esp, ebp                  ; Aponta o ponteiro da base da pilha (ebp) para o topo
+        pop ebp                       ; Tira o elemento do topo da pilha e guarda o valor em ebp
+        ret                           ; Retira o último valor do topo da pilha e dá um jump para ele (a linha de retorno nesse caso)
 
-        mov     esp, ebp              ; aponta o ponteiro da base da pilha (ebp) para o topo
-        pop     ebp                   ; tira o elemento do topo da pilha e guarda o valor em ebp
-        ret                           ; retira o ultimo valor do topo da pilha e da um jump para ele (a linha de retorno nesse caso)
 itoa:
     ; Entradas:
     ; eax: número a ser convertido
@@ -206,14 +209,14 @@ section .data
     msg:
                           db        "disc: "   
         disco:            db        "  "
-                          db        "   "                      
+                        db        "   "                      
         pino_destino:      db        " "  
                           db        " -> "     
         pino_origem:     db        " ", 0xa  ; para quebrar linha
         
         lenght            equ       $-msg
 
-    mensagem_final db 'Número de movimentos:   ', 0xa    ; mensagem final
+    mensagem_final db 'Número de movimentos:    ', 0xa    ; mensagem final
     len_mensagem_final equ $-mensagem_final             ; tamanho da mensagem final
     num_length equ 10                  ; tamanho máximo da string convertida
 
